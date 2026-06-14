@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carapace - Find exploitable bugs before attackers do</title>
+    <meta
+      name="description"
+      content="Carapace is a local security CLI that triages code, deep-dives plausible findings, and records reviewable reports."
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #fbfbf8;
+        --band: #f1f5f2;
+        --surface: #ffffff;
+        --ink: #18211f;
+        --muted: #5a6863;
+        --line: #d9e0dc;
+        --accent: #0f766e;
+        --accent-dark: #0b5d57;
+        --warn: #a15c07;
+        --danger: #b42318;
+        --code: #111816;
+        --code-soft: #d7efe8;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.6;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .wrap {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(251, 251, 248, 0.94);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(10px);
+      }
+
+      .nav {
+        min-height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 760;
+        letter-spacing: 0;
+      }
+
+      .mark {
+        width: 28px;
+        height: 28px;
+        border: 2px solid var(--ink);
+        display: grid;
+        place-items: center;
+        font-size: 14px;
+        font-weight: 800;
+        background: var(--surface);
+      }
+
+      .lang-switch {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        padding: 4px;
+      }
+
+      .globe {
+        padding: 0 6px;
+        color: var(--muted);
+      }
+
+      button {
+        font: inherit;
+      }
+
+      .lang-switch button {
+        min-width: 44px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        padding: 6px 8px;
+        cursor: pointer;
+      }
+
+      .lang-switch button[aria-pressed="true"] {
+        background: var(--ink);
+        color: white;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        min-height: 620px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='1200' height='720' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1200' height='720' fill='%23eef4f0'/%3E%3Cg font-family='Consolas, monospace' font-size='20' fill='%23111816'%3E%3Ctext x='620' y='128'%3E$ carapace scan ./app --verbose%3C/text%3E%3Ctext x='620' y='178'%3ERead files: 12/12%3C/text%3E%3Ctext x='620' y='228'%3ETriage candidates: 5%3C/text%3E%3Ctext x='620' y='278'%3EAuto deep-dive candidates: 1%3C/text%3E%3Ctext x='620' y='328'%3EReportable concerns: 1%3C/text%3E%3Ctext x='620' y='408'%3E[MEDIUM] Server-side URL fetch can reach internal targets%3C/text%3E%3Ctext x='620' y='458'%3ECounter-evidence and limits included%3C/text%3E%3Ctext x='620' y='508'%3ERecommended fixes written for engineers%3C/text%3E%3C/g%3E%3C/svg%3E");
+        background-size: cover;
+        background-position: center;
+        opacity: 0.34;
+      }
+
+      .hero .wrap {
+        position: relative;
+        padding: 84px 0 96px;
+      }
+
+      .eyebrow {
+        color: var(--accent-dark);
+        font-weight: 720;
+        margin: 0 0 14px;
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 0;
+        font-size: clamp(42px, 7vw, 86px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 650px;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: 20px;
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 14px;
+        margin-top: 34px;
+      }
+
+      .command {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 10px 14px;
+        background: var(--code);
+        color: var(--code-soft);
+        font-family: Consolas, "SFMono-Regular", monospace;
+        font-size: 15px;
+      }
+
+      .note {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      section {
+        padding: 72px 0;
+      }
+
+      .band {
+        background: var(--band);
+        border-block: 1px solid var(--line);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: clamp(28px, 4vw, 44px);
+        line-height: 1.1;
+        letter-spacing: 0;
+      }
+
+      .section-lead {
+        max-width: 760px;
+        margin: 0 0 32px;
+        color: var(--muted);
+        font-size: 18px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+
+      .two {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        padding: 22px;
+        border-radius: 8px;
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+        font-size: 19px;
+        line-height: 1.25;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .cost-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--surface);
+        border: 1px solid var(--line);
+      }
+
+      .cost-table th,
+      .cost-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .cost-table th {
+        background: #eef4f0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .cost-table td:nth-child(n + 2),
+      .cost-table th:nth-child(n + 2) {
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        counter-reset: step;
+      }
+
+      .step {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        padding: 18px;
+        border-radius: 8px;
+      }
+
+      .step::before {
+        counter-increment: step;
+        content: counter(step);
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        margin-bottom: 16px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .step code,
+      .inline-code {
+        font-family: Consolas, "SFMono-Regular", monospace;
+        background: #eef4f0;
+        padding: 2px 5px;
+      }
+
+      footer {
+        padding: 32px 0;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+      }
+
+      .lang {
+        display: none;
+      }
+
+      html[data-lang="ja"] .lang-ja,
+      html[data-lang="en"] .lang-en {
+        display: block;
+      }
+
+      @media (max-width: 820px) {
+        .hero {
+          min-height: 560px;
+        }
+
+        .hero::before {
+          background-image: url("data:image/svg+xml,%3Csvg width='820' height='560' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='820' height='560' fill='%23eef4f0'/%3E%3Cg font-family='Consolas, monospace' font-size='16' fill='%23111816'%3E%3Ctext x='32' y='340'%3E$ carapace scan ./app%3C/text%3E%3Ctext x='32' y='384'%3ETriage: 5 / Deep-dive: 1%3C/text%3E%3Ctext x='32' y='428'%3EReportable concerns: 1%3C/text%3E%3C/g%3E%3C/svg%3E");
+          opacity: 0.2;
+        }
+
+        .grid,
+        .two,
+        .steps {
+          grid-template-columns: 1fr;
+        }
+
+        .cost-table {
+          font-size: 14px;
+        }
+
+        .cost-table th,
+        .cost-table td {
+          padding: 12px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap nav">
+        <div class="brand" aria-label="Carapace">
+          <span class="mark">C</span>
+          <span>Carapace</span>
+        </div>
+        <div class="lang-switch" aria-label="Language selector">
+          <span class="globe" aria-hidden="true">🌐</span>
+          <button type="button" data-set-lang="ja">日本語</button>
+          <button type="button" data-set-lang="en">English</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="lang lang-ja">
+        <section class="hero">
+          <div class="wrap">
+            <p class="eyebrow">Local-first security CLI</p>
+            <h1>攻撃者が見つける前に、直す。</h1>
+            <p class="lead">
+              Carapace は、手元のコードを読み、攻撃可能性のある脆弱性だけを慎重に報告するローカルCLIです。
+            </p>
+            <div class="cta-row">
+              <span class="command">npm install -g carapace-sec</span>
+              <span class="note">ツール本体は無料。APIキーはユーザー自身のものを使います。</span>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h2>実在の業務SaaSで、本物のSSRFを検出。</h2>
+            <p class="section-lead">
+              Carapace は外部URLをサーバー側で取得する処理を調べ、攻撃者がその入力に到達できるか、どこまでコードで裏取りできるかを確認しました。報告後、この問題は対処済みです。攻撃に使える再現手順や内部パスは公開しません。
+            </p>
+            <div class="grid two">
+              <div class="card">
+                <h3>見たのは「fetchしている」だけではない</h3>
+                <p>誰がURLを設定できるか、リダイレクト後に再検証されるか、内部宛て通信を防げるかを確認します。</p>
+              </div>
+              <div class="card">
+                <h3>断定しすぎない報告</h3>
+                <p>コード根拠、攻撃前提、反証制限、推奨修正を分けて、人間が判断できる形で出します。</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="wrap">
+            <h2>実測ベースのコスト感</h2>
+            <p class="section-lead">USDが実請求の基準、円は $1 = 160円 の参考換算です。Anthropicの価格や為替で変動します。</p>
+            <table class="cost-table">
+              <thead>
+                <tr>
+                  <th>シナリオ</th>
+                  <th>ファイル数</th>
+                  <th>自動deep-dive</th>
+                  <th>実測目安</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>小さめの入力面スキャン</td>
+                  <td>13</td>
+                  <td>1</td>
+                  <td>$0.22（約35円）</td>
+                </tr>
+                <tr>
+                  <td>認証まわりの重点スキャン</td>
+                  <td>11</td>
+                  <td>0</td>
+                  <td>$0.12（約19円）</td>
+                </tr>
+                <tr>
+                  <td>外部URLまわりの標準スキャン</td>
+                  <td>12</td>
+                  <td>2</td>
+                  <td>$0.93（約148円）</td>
+                </tr>
+                <tr>
+                  <td>中規模OSSのURL取込スキャン</td>
+                  <td>19</td>
+                  <td>2</td>
+                  <td>$1.43（約228円）</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h2>ClaudeやFableに直接読ませるのと何が違う？</h2>
+            <div class="grid">
+              <div class="card">
+                <h3>セキュリティ用途の制限</h3>
+                <p>汎用フロンティアモデルは、脆弱性の深掘り依頼が制限されることがあります。Carapaceは検査の流れをCLIとして組み立てます。</p>
+              </div>
+              <div class="card">
+                <h3>到達性を見る</h3>
+                <p>「危ない分岐がある」と「攻撃者がそこに入れる」は別です。Carapaceは到達性を確認して誤検知を減らします。</p>
+              </div>
+              <div class="card">
+                <h3>精度とコストを分ける</h3>
+                <p>安いトリアージと慎重なdeep-diveを分けます。lowは記録に残し、自動では掘りません。</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="wrap">
+            <h2>公開しているもの、手元に残るもの。</h2>
+            <p class="section-lead">
+              Carapace は検査ロジックやプロンプトを隠しません。価値は秘密の手順ではなく、答え合わせを蓄積し、作法を磨き続ける仕組みにあります。
+            </p>
+            <div class="grid two">
+              <div class="card">
+                <h3>公開するもの</h3>
+                <p>CLIコード、検査ロジック、プロンプト、報告フォーマット、コストの考え方。</p>
+              </div>
+              <div class="card">
+                <h3>手元に残るもの</h3>
+                <p>あなたのソースコード、APIキー、スキャン履歴、reviewの答え合わせ。</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h2>基本の使い方</h2>
+            <div class="steps">
+              <div class="step"><code>carapace init</code><p>APIキーと出力言語を設定します。</p></div>
+              <div class="step"><code>carapace scan</code><p>ファイルを集め、トリアージし、必要な候補だけ深掘りします。</p></div>
+              <div class="step"><code>carapace report</code><p>人に見せられる形で報告を出します。</p></div>
+              <div class="step"><code>carapace review</code><p>本物/誤検知/要検証を記録し、判例を溜めます。</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="wrap">
+            <h2>無料で使える。API代は自分で管理。</h2>
+            <p class="section-lead">
+              Carapace本体は無料です。Anthropic APIキーとトークン代はユーザー自身のものを使います。Carapaceはコードをサーバーへアップロードせず、トークン代も立て替えません。
+            </p>
+            <div class="grid two">
+              <div class="card">
+                <h3>責任ある使い方</h3>
+                <p>自分のコード、許可を得たコード、または公開OSSをローカルで読む用途に使ってください。</p>
+              </div>
+              <div class="card">
+                <h3>何をしないか</h3>
+                <p>Carapaceは修正までは行いません。見つけて、報告し、答え合わせを残すツールです。</p>
+              </div>
+            </div>
+            <p class="note">対応環境: Node.js 20+。日本語/英語出力に対応。</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="lang lang-en">
+        <section class="hero">
+          <div class="wrap">
+            <p class="eyebrow">Local-first security CLI</p>
+            <h1>Find exploitable bugs before attackers do.</h1>
+            <p class="lead">
+              Carapace is a local CLI that reads focused code paths and reports security concerns only when the attack path is plausible.
+            </p>
+            <div class="cta-row">
+              <span class="command">npm install -g carapace-sec</span>
+              <span class="note">The tool is free. You use your own API key.</span>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h2>A real SSRF found in a production SaaS.</h2>
+            <p class="section-lead">
+              Carapace reviewed a server-side flow that fetched externally controlled URLs. It checked who could set the input, whether an attacker could reach the path, and how much the code proved. The issue was reported and addressed. Exploit-ready reproduction details and internal paths are not published.
+            </p>
+            <div class="grid two">
+              <div class="card">
+                <h3>Not just “this code fetches a URL”</h3>
+                <p>Carapace checks who controls the URL, whether redirect targets are revalidated, and whether internal targets are blocked.</p>
+              </div>
+              <div class="card">
+                <h3>Reports with honest limits</h3>
+                <p>It separates evidence, prerequisites, attack story, counter-evidence, and recommended fixes so a human can judge it.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="wrap">
+            <h2>Real-run cost guide</h2>
+            <p class="section-lead">USD is the billing currency. JPY is an approximate reference at USD 1 = JPY 160. Model prices and exchange rates can change.</p>
+            <table class="cost-table">
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Files</th>
+                  <th>Auto deep-dives</th>
+                  <th>Estimate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Small input-surface scan</td>
+                  <td>13</td>
+                  <td>1</td>
+                  <td>$0.22, about JPY 35</td>
+                </tr>
+                <tr>
+                  <td>Auth-focused scan</td>
+                  <td>11</td>
+                  <td>0</td>
+                  <td>$0.12, about JPY 19</td>
+                </tr>
+                <tr>
+                  <td>External-URL standard scan</td>
+                  <td>12</td>
+                  <td>2</td>
+                  <td>$0.93, about JPY 148</td>
+                </tr>
+                <tr>
+                  <td>Medium OSS URL-ingest scan</td>
+                  <td>19</td>
+                  <td>2</td>
+                  <td>$1.43, about JPY 228</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h2>Why not just ask Claude or Fable?</h2>
+            <div class="grid">
+              <div class="card">
+                <h3>Security deep-dives may be limited</h3>
+                <p>General frontier models may block or downgrade direct vulnerability deep-dive requests. Carapace packages the review workflow into a CLI.</p>
+              </div>
+              <div class="card">
+                <h3>It checks reachability</h3>
+                <p>“A dangerous branch exists” is not the same as “an attacker can reach it.” Carapace checks that path before reporting.</p>
+              </div>
+              <div class="card">
+                <h3>It separates cost from confidence</h3>
+                <p>Cheap triage and careful deep-dive are separate. Low findings are logged, not automatically escalated.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="wrap">
+            <h2>Transparent by design.</h2>
+            <p class="section-lead">
+              Carapace does not rely on hidden prompt tricks. The value is the review loop, accumulated validation cases, and a methodology that keeps improving.
+            </p>
+            <div class="grid two">
+              <div class="card">
+                <h3>Public</h3>
+                <p>CLI code, inspection logic, prompts, report shape, and cost model.</p>
+              </div>
+              <div class="card">
+                <h3>Local</h3>
+                <p>Your source code, API key, scan history, and review answers.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="wrap">
+            <h2>Basic flow</h2>
+            <div class="steps">
+              <div class="step"><code>carapace init</code><p>Configure your API key and output language.</p></div>
+              <div class="step"><code>carapace scan</code><p>Collect files, triage, and deep-dive only the candidates that deserve it.</p></div>
+              <div class="step"><code>carapace report</code><p>Print a report that a human can read and act on.</p></div>
+              <div class="step"><code>carapace review</code><p>Record real concern, false positive, or needs validation.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="wrap">
+            <h2>Free tool. Your API bill.</h2>
+            <p class="section-lead">
+              Carapace is free. You use your own Anthropic API key and pay your own model costs. Carapace does not upload your repository to a Carapace server or resell tokens.
+            </p>
+            <div class="grid two">
+              <div class="card">
+                <h3>Responsible use</h3>
+                <p>Use it on code you own, code you are authorized to review, or public OSS inspected locally.</p>
+              </div>
+              <div class="card">
+                <h3>What it does not do</h3>
+                <p>Carapace does not patch code. It finds, reports, and records validation.</p>
+              </div>
+            </div>
+            <p class="note">Requirements: Node.js 20+. Japanese and English output.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">Carapace - local-first vulnerability review CLI.</div>
+    </footer>
+
+    <script>
+      const root = document.documentElement;
+      const buttons = Array.from(document.querySelectorAll("[data-set-lang]"));
+
+      function initialLanguage() {
+        const saved = localStorage.getItem("carapace-lang");
+        if (saved === "ja" || saved === "en") return saved;
+        return navigator.language && navigator.language.toLowerCase().startsWith("ja") ? "ja" : "en";
+      }
+
+      function setLanguage(lang) {
+        root.dataset.lang = lang;
+        root.lang = lang;
+        localStorage.setItem("carapace-lang", lang);
+        buttons.forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.setLang === lang));
+        });
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => setLanguage(button.dataset.setLang));
+      });
+
+      setLanguage(initialLanguage());
+    </script>
+  </body>
+</html>

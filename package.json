@@ -1,0 +1,39 @@
+{
+  "name": "carapace-sec",
+  "version": "0.1.0",
+  "description": "A local CLI that scans code for security concerns before attackers do.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "carapace": "./dist/cli.js"
+  },
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md"
+  ],
+  "keywords": [
+    "security",
+    "cli",
+    "vulnerability",
+    "code-review",
+    "triage"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "start": "node dist/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.102.0"
+  }
+}
