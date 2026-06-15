@@ -191,6 +191,16 @@
         font-size: 15px;
       }
 
+      .setup-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        color: var(--accent-dark);
+        font-weight: 700;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+      }
+
       .note {
         color: var(--muted);
         font-size: 14px;
@@ -296,6 +306,11 @@
         grid-template-columns: repeat(4, 1fr);
         gap: 12px;
         counter-reset: step;
+      }
+
+      .setup-steps {
+        grid-template-columns: repeat(5, 1fr);
+        counter-reset: step -1;
       }
 
       .step {
@@ -522,7 +537,39 @@
             </p>
             <div class="cta-row">
               <span class="command">npm install -g carapace-sec</span>
+              <a class="setup-link" href="#setup-ja">使い始めるにはこちら</a>
               <span class="note">ツール本体は無料。APIキーはユーザー自身のものを使います。</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="setup-ja" class="band">
+          <div class="wrap">
+            <h2>セットアップ</h2>
+            <p class="section-lead">
+              CarapaceはAnthropicのClaude APIを使います。利用にはAnthropic Consoleのアカウント、プリペイド残高、APIキーが必要です。
+            </p>
+            <div class="steps setup-steps">
+              <div class="step">
+                <code>Console</code>
+                <p><a class="email-link" href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer">Anthropic Console</a>でアカウントを作成します。</p>
+              </div>
+              <div class="step">
+                <code>Billing</code>
+                <p>Consoleで残高を入金します。Carapaceのスキャンはこの残高を消費します。</p>
+              </div>
+              <div class="step">
+                <code>API key</code>
+                <p>ConsoleのAPI Keysから新しいAPIキーを作成します。</p>
+              </div>
+              <div class="step">
+                <code>npm install</code>
+                <p><span class="inline-code">npm install -g carapace-sec</span>でCLIをインストールします。</p>
+              </div>
+              <div class="step">
+                <code>carapace init</code>
+                <p>取得したAPIキーを設定します。これで<span class="inline-code">carapace scan</span>が使えます。</p>
+              </div>
             </div>
           </div>
         </section>
@@ -710,7 +757,39 @@
             </p>
             <div class="cta-row">
               <span class="command">npm install -g carapace-sec</span>
+              <a class="setup-link" href="#setup-en">Read the setup guide</a>
               <span class="note">The tool is free. You use your own API key.</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="setup-en" class="band">
+          <div class="wrap">
+            <h2>Setup</h2>
+            <p class="section-lead">
+              Carapace uses Anthropic's Claude API. You need an Anthropic Console account, prepaid credit, and an API key before scanning.
+            </p>
+            <div class="steps setup-steps">
+              <div class="step">
+                <code>Console</code>
+                <p>Create an account at <a class="email-link" href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer">Anthropic Console</a> if you do not have one.</p>
+              </div>
+              <div class="step">
+                <code>Billing</code>
+                <p>Add prepaid credit in Console. Carapace scans consume that balance.</p>
+              </div>
+              <div class="step">
+                <code>API key</code>
+                <p>Create a new API key from API Keys in Console.</p>
+              </div>
+              <div class="step">
+                <code>npm install</code>
+                <p>Install the CLI with <span class="inline-code">npm install -g carapace-sec</span>.</p>
+              </div>
+              <div class="step">
+                <code>carapace init</code>
+                <p>Configure the API key. After that, <span class="inline-code">carapace scan</span> is ready to use.</p>
+              </div>
             </div>
           </div>
         </section>

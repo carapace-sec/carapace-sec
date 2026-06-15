@@ -76,6 +76,11 @@ export async function runInit(argv: string[], cwd: string): Promise<number> {
     return 1;
   }
 
+  for (const line of messages.apiKeySetupGuide()) {
+    console.log(line);
+  }
+  console.log("");
+
   const apiKey = await promptForSecret(messages.apiKeyPrompt());
   if (!apiKey.trim()) {
     console.error(messages.emptyApiKey());

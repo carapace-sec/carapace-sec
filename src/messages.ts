@@ -84,6 +84,7 @@ export type InitMessages = {
   windowsOnlyStorage: () => string;
   setApiKeyAndRetry: () => string;
   emptyApiKey: () => string;
+  apiKeySetupGuide: () => string[];
   apiKeyPrompt: () => string;
 };
 
@@ -234,6 +235,11 @@ const EN_INIT_MESSAGES: InitMessages = {
   windowsOnlyStorage: () => "Encrypted prompt-based storage is currently implemented for Windows only.",
   setApiKeyAndRetry: () => "Set ANTHROPIC_API_KEY and run carapace init again.",
   emptyApiKey: () => "API key was empty. Nothing saved.",
+  apiKeySetupGuide: () => [
+    "Carapace analyzes code with Anthropic's Claude API.",
+    "You need an Anthropic API key and prepaid Console credit before scanning.",
+    "If you do not have one yet, create an account, add credit, and create an API key at https://console.anthropic.com before continuing.",
+  ],
   apiKeyPrompt: () => "Anthropic API key: ",
 };
 
@@ -404,6 +410,11 @@ const JA_INIT_MESSAGES: InitMessages = {
   windowsOnlyStorage: () => "プロンプト入力による暗号化保存は、現在Windowsだけに対応しています。",
   setApiKeyAndRetry: () => "ANTHROPIC_API_KEY を設定してから、もう一度 carapace init を実行してください。",
   emptyApiKey: () => "APIキーが空でした。保存せずに終了します。",
+  apiKeySetupGuide: () => [
+    "CarapaceはAnthropicのClaude APIを使って解析します。",
+    "利用にはAnthropicのAPIキーと、Consoleへの残高入金（プリペイド）が必要です。",
+    "お持ちでなければ、https://console.anthropic.com でアカウント作成、残高入金、APIキー取得をしてから続けてください。",
+  ],
   apiKeyPrompt: () => "Anthropic API key: ",
 };
 

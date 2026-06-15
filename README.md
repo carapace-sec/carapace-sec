@@ -6,6 +6,32 @@ The npm package is `carapace-sec`. The installed command is `carapace`.
 
 Carapace is an early release built for narrow scans first: collect a focused set of files, triage cheaply, deep-dive only the candidates that deserve it, and record the result locally for review.
 
+## Prerequisite: Anthropic Claude API Key
+
+Carapace uses the Anthropic Claude API. Scans consume your own prepaid balance in Anthropic Console.
+
+Before using Carapace:
+
+1. Create an account at https://console.anthropic.com if you do not have one.
+2. Add prepaid credit in Anthropic Console.
+3. Create an API key in Anthropic Console.
+4. Run `carapace init` and paste that API key when prompted.
+
+Carapace does not provide tokens, proxy your requests, or pay model costs on your behalf.
+
+## 前提: Anthropic Claude APIキーが必要です
+
+CarapaceはAnthropic Claude APIを使います。スキャンには、あなた自身のAnthropic Console残高（プリペイド）が消費されます。
+
+利用前に:
+
+1. https://console.anthropic.com でアカウントを作成する（未作成の場合）。
+2. Anthropic Consoleで残高を入金する。
+3. Anthropic ConsoleでAPIキーを取得する。
+4. `carapace init` を実行し、取得したAPIキーを入力する。
+
+Carapaceはトークンを提供せず、リクエストを中継せず、モデル利用料を立て替えません。
+
 ## Install
 
 ```sh
