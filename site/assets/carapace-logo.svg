@@ -1,0 +1,10 @@
+<svg width="252" height="48" viewBox="0 0 252 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Carapace</title>
+  <rect x="1.5" y="6.5" width="35" height="35" rx="5.5" fill="#11161A" stroke="#11161A" stroke-width="3"/>
+  <path d="M4 15H34" stroke="#1A6B5A" stroke-width="4" stroke-linecap="square"/>
+  <text x="10" y="32" fill="#F3FBF7" font-family="Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace" font-size="19" font-weight="700" letter-spacing="0">C</text>
+  <rect x="24" y="30" width="7" height="2.5" fill="#1A6B5A"/>
+  <text x="50" y="32" fill="#11161A" font-family="Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace" font-size="27" font-weight="700" letter-spacing="0">Carapace</text>
+  <rect x="209" y="15" width="4" height="21" fill="#1A6B5A"/>
+  <path d="M50 39H213" stroke="#1A6B5A" stroke-width="2" stroke-linecap="square" opacity="0.18"/>
+</svg>

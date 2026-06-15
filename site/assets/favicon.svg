@@ -1,0 +1,6 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="5" y="5" width="54" height="54" rx="9" fill="#11161A"/>
+  <path d="M9 18H55" stroke="#1A6B5A" stroke-width="8" stroke-linecap="square"/>
+  <text x="17" y="44" fill="#F3FBF7" font-family="Consolas, 'SFMono-Regular', 'Cascadia Mono', monospace" font-size="31" font-weight="800" letter-spacing="0">C</text>
+  <rect x="40" y="42" width="10" height="4" fill="#1A6B5A"/>
+</svg>
