@@ -1,6 +1,6 @@
 {
   "name": "carapace-sec",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A local CLI that scans code for security concerns before attackers do.",
   "license": "MIT",
   "type": "module",
