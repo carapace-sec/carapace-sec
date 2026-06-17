@@ -106,9 +106,11 @@ These are real-run estimates from the development history of Carapace. Anthropic
 
 Carapace keeps cost under control by not deep-diving every low candidate.
 
-## Stayble Case Study
+## Internal SaaS Case Study
 
-The first confirmed real concern found by Carapace was in Stayble, an internal SaaS used as the initial test target.
+The first confirmed real concern found by Carapace was in an internal SaaS used as the initial test target.
+
+The issue was reported and addressed before public launch.
 
 The issue class was SSRF: a server-side path accepted externally controlled URLs, fetched them from the backend, and could plausibly be abused if private-network destinations were not blocked and redirect destinations were not revalidated.
 
